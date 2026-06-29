@@ -95,8 +95,8 @@ function handleKey(e) {
   }
 }
 
-function sendSuggestion(btn) {
-  inputEl.value = btn.textContent;
+function sendSuggestion(text) {
+  inputEl.value = (typeof text === "string") ? text : text.textContent;
   sendMessage();
 }
 

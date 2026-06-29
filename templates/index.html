@@ -356,8 +356,14 @@ function switchLang(newLang) {
 
   // Suggestions
   document.getElementById('sug-list').innerHTML = t.suggestions.map(s =>
-    `<button class="s-btn" onclick="sendSuggestion('${s.text.replace(/'/g,"\\'")}'">${s.icon} ${s.text}</button>`
-  ).join('');
+  `<button class="s-btn" data-text="${s.text.replace(/"/g,'&quot;')}">${s.icon} ${s.text}</button>`
+).join('');
+
+// Délégation d'événement — à ajouter juste après
+  document.getElementById('sug-list').addEventListener('click', e => {
+  const btn = e.target.closest('.s-btn');
+  if (btn) sendSuggestion(btn.dataset.text);
+});
 
   // Active button
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));

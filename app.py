@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os, json, sqlite3, uuid
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()  # ← ajoute cette ligne avant d'utiliser os.environ
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 
