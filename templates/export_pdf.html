@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Lumia · Export Conversation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#1a1a2e;padding:32px;max-width:780px;margin:0 auto}
+
+/* print header */
+.pdf-header{display:flex;align-items:center;justify-content:space-between;
+  border-bottom:2px solid #667eea;padding-bottom:16px;margin-bottom:24px}
+.pdf-logo{display:flex;align-items:center;gap:12px}
+.pdf-logo-dot{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#54a0ff,#ff9ff3);
+  display:flex;align-items:center;justify-content:center;font-size:18px}
+.pdf-title{font-size:22px;font-weight:700;color:#1a1a2e}
+.pdf-sub{font-size:11px;color:#666;margin-top:2px}
+.pdf-meta{text-align:right;font-size:11px;color:#888}
+
+/* stats row */
+.pdf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-bottom:24px;padding:16px;background:#f8f9ff;border-radius:12px;border:1px solid #e8eaf6}
+.pdf-stat{text-align:center}
+.pdf-stat-val{font-size:20px;font-weight:700;color:#667eea}
+.pdf-stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+
+/* messages */
+.msg{display:flex;gap:10px;margin-bottom:12px;page-break-inside:avoid}
+.msg.user{flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px}
+.msg.user .av{background:linear-gradient(135deg,#54a0ff,#7b68ee)}
+.msg.assistant .av{background:linear-gradient(135deg,#ff9ff3,#ff6b6b)}
+.msg-body{max-width:78%}
+.bubble{padding:9px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.msg.user .bubble{background:#eef2ff;border-bottom-right-radius:3px}
+.msg.assistant .bubble{background:#f8f9ff;border-bottom-left-radius:3px}
+.msg.user .bubble[dir="rtl"]{text-align:right}
+.meta{font-size:9px;color:#aaa;margin-top:4px;display:flex;align-items:center;gap:6px}
+.badge{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600}
+.positif{background:#d4edda;color:#155724}
+.neutre{background:#e2e3e5;color:#383d41}
+.negatif{background:#f8d7da;color:#721c24}
+
+/* footer */
+.pdf-footer{margin-top:32px;padding-top:14px;border-top:1px solid #e8eaf6;
+  font-size:10px;color:#aaa;text-align:center}
+
+/* print styles */
+@media print{
+  body{padding:20px}
+  .no-print{display:none!important}
+  .msg{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- Print button (hidden in print) -->
+<div class="no-print" style="margin-bottom:20px;display:flex;gap:10px">
+  <button onclick="window.print()" style="padding:10px 24px;border-radius:20px;border:none;
+    background:linear-gradient(135deg,#54a0ff,#7b68ee);color:#fff;font-size:14px;cursor:pointer">
+    🖨️ Imprimer / Enregistrer PDF
+  </button>
+  <button onclick="window.close()" style="padding:10px 20px;border-radius:20px;border:1px solid #ddd;
+    background:#fff;color:#666;font-size:14px;cursor:pointer">✕ Fermer</button>
+</div>
+
+<!-- PDF Header -->
+<div class="pdf-header">
+  <div class="pdf-logo">
+    <div class="pdf-logo-dot">✨</div>
+    <div>
+      <div class="pdf-title">Lumia · Rapport de conversation</div>
+      <div class="pdf-sub">Assistant IA Premium</div>
+    </div>
+  </div>
+  <div class="pdf-meta">
+    <div>Session : {{ session_id[:16] }}…</div>
+    <div>Exporté le {{ exported_at }}</div>
+  </div>
+</div>
+
+<!-- Stats -->
+{% set user_msgs = messages | selectattr('role','equalto','user') | list %}
+{% set pos = messages | selectattr('sentiment_label','equalto','positif') | list %}
+{% set neg = messages | selectattr('sentiment_label','equalto','negatif') | list %}
+<div class="pdf-stats">
+  <div class="pdf-stat"><div class="pdf-stat-val">{{ messages | length }}</div><div class="pdf-stat-lbl">Messages</div></div>
+  <div class="pdf-stat"><div class="pdf-stat-val">{{ user_msgs | length }}</div><div class="pdf-stat-lbl">De l'utilisateur</div></div>
+  <div class="pdf-stat"><div class="pdf-stat-val" style="color:#2ecc71">{{ pos | length }}</div><div class="pdf-stat-lbl">😊 Positifs</div></div>
+  <div class="pdf-stat"><div class="pdf-stat-val" style="color:#e74c3c">{{ neg | length }}</div><div class="pdf-stat-lbl">😟 Négatifs</div></div>
+</div>
+
+<!-- Messages -->
+{% for m in messages %}
+<div class="msg {{ m.role }}">
+  <div class="av">{{ '👤' if m.role=='user' else '✨' }}</div>
+  <div class="msg-body">
+    <div class="bubble" {{ 'dir="rtl"' if m.language=='ar' else '' }}>{{ m.message }}</div>
+    <div class="meta">
+      <span>{{ m.role|capitalize }}</span>
+      <span>{{ (m.created_at or '')[:16].replace('T',' ') }}</span>
+      {% if m.language %}<span style="text-transform:uppercase">{{ m.language }}</span>{% endif %}
+      {% if m.sentiment_label %}
+        <span class="badge {{ m.sentiment_label }}">
+          {{ '😊' if m.sentiment_label=='positif' else '😟' if m.sentiment_label=='negatif' else '😐' }}
+          {{ m.sentiment_label }} · {{ "%.2f"|format(m.sentiment_score) if m.sentiment_score else '0.00' }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="pdf-footer">
+  Généré par Lumia AI — {{ exported_at }} — Confidentiel
+</div>
+</body>
+</html>

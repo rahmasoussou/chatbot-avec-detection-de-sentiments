@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumia · Historique</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --dark:#0d0d1a;--card:#1a1a35;--card2:#1e1e3f;
+  --border:rgba(255,255,255,0.08);--text:#f0f0ff;--muted:#8888bb;--hint:#4444aa;
+  --green:#2ecc71;--red:#e74c3c;--blue:#54a0ff;--purple:#ff9ff3;--gold:#feca57;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--dark);color:var(--text);min-height:100vh}
+
+/* orbs */
+.bg-orbs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.1;animation:drift 14s ease-in-out infinite}
+.orb1{width:500px;height:500px;background:#54a0ff;top:-150px;left:-100px}
+.orb2{width:400px;height:400px;background:#ff9ff3;bottom:-100px;right:-80px;animation-delay:-7s}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+
+.page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:28px 24px}
+
+/* header */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.page-header-left{display:flex;align-items:center;gap:14px}
+.back-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;
+  border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,0.05);
+  color:var(--muted);text-decoration:none;font-size:13px;transition:all 0.2s}
+.back-btn:hover{background:rgba(255,255,255,0.09);color:var(--text)}
+.page-title{font-size:20px;font-weight:600}
+.page-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* export bar */
+.export-bar{display:flex;gap:8px;flex-wrap:wrap}
+.export-btn{display:flex;align-items:center;gap:6px;padding:9px 18px;
+  border-radius:20px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s}
+.btn-pdf{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff}
+.btn-pdf:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(231,76,60,0.3)}
+.btn-csv{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff}
+.btn-csv:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(46,204,113,0.3)}
+.btn-print{background:linear-gradient(135deg,#54a0ff,#7b68ee);color:#fff}
+.btn-print:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(84,160,255,0.3)}
+
+/* stats strip */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:rgba(26,26,53,0.8);border:1px solid var(--border);border-radius:14px;
+  padding:14px 16px;text-align:center}
+.stat-val{font-size:24px;font-weight:700}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px}
+
+/* filter bar */
+.filter-bar{display:flex;gap:7px;margin-bottom:18px;flex-wrap:wrap}
+.f-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.15s}
+.f-btn:hover{background:rgba(255,255,255,0.06)}
+.f-btn.active{background:rgba(84,160,255,0.15);color:var(--blue);border-color:rgba(84,160,255,0.3)}
+
+/* search */
+.search-wrap{position:relative;margin-bottom:18px}
+.search-input{width:100%;padding:11px 16px 11px 40px;background:rgba(26,26,53,0.8);
+  border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:14px;outline:none;transition:all 0.2s}
+.search-input:focus{border-color:rgba(84,160,255,0.5);box-shadow:0 0 0 3px rgba(84,160,255,0.07)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted)}
+
+/* messages */
+.msg-list{display:flex;flex-direction:column;gap:10px}
+.msg-item{display:flex;gap:10px;padding:14px 16px;
+  background:rgba(26,26,53,0.75);border:1px solid var(--border);
+  border-radius:14px;transition:background 0.15s;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg-item:hover{background:rgba(30,30,63,0.9)}
+.msg-item.user{border-left:3px solid var(--blue)}
+.msg-item.assistant{border-left:3px solid var(--purple)}
+
+.msg-av{width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:14px}
+.msg-item.user .msg-av{background:linear-gradient(135deg,#54a0ff,#7b68ee)}
+.msg-item.assistant .msg-av{background:linear-gradient(135deg,#ff9ff3,#ff6b6b)}
+
+.msg-body{flex:1;min-width:0}
+.msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.msg-role{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em}
+.msg-item.user .msg-role{color:var(--blue)}
+.msg-item.assistant .msg-role{color:var(--purple)}
+.msg-time{font-size:10px;color:var(--hint)}
+.msg-lang{font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,0.07);
+  color:var(--muted);text-transform:uppercase}
+
+.msg-text{font-size:13px;line-height:1.55;color:var(--text);word-break:break-word}
+
+.sent-badge{display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;padding:2px 8px;border-radius:12px;margin-top:6px;font-weight:500}
+.positif{background:rgba(46,204,113,0.12);color:#2ecc71;border:1px solid rgba(46,204,113,0.2)}
+.neutre{background:rgba(136,135,128,0.12);color:#888780;border:1px solid rgba(136,135,128,0.2)}
+.negatif{background:rgba(231,76,60,0.12);color:#e74c3c;border:1px solid rgba(231,76,60,0.2)}
+
+.empty{text-align:center;padding:48px;color:var(--muted);font-size:14px}
+
+@media(max-width:600px){
+  .stats-strip{grid-template-columns:repeat(2,1fr)}
+  .page-header{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+
+<div class="page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <a href="/" class="back-btn">← Retour</a>
+      <div>
+        <div class="page-title">📋 Historique de conversation</div>
+        <div class="page-sub">Session : {{ session_id[:16] }}…</div>
+      </div>
+    </div>
+    <div class="export-bar">
+      <button class="export-btn btn-pdf" onclick="exportPDF()">📄 Export PDF</button>
+      <button class="export-btn btn-csv" onclick="window.location='/history/export/csv'">📊 Export CSV</button>
+      <button class="export-btn btn-print" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip" id="statsStrip"></div>
+
+  <!-- Filter + Search -->
+  <div class="filter-bar" id="filterBar"></div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="searchInput"
+           placeholder="Rechercher dans la conversation…" oninput="renderMessages()">
+  </div>
+
+  <!-- Messages -->
+  <div class="msg-list" id="msgList"></div>
+</div>
+
+<script>
+const RAW = {{ messages | tojson }};
+const EMOJIS = {positif:'😊', neutre:'😐', negatif:'😟'};
+const LABELS  = {positif:'Positif', neutre:'Neutre', negatif:'Négatif'};
+let activeFilter = null;
+
+function buildStats() {
+  const total = RAW.length;
+  const user  = RAW.filter(m=>m.role==='user').length;
+  const pos   = RAW.filter(m=>m.sentiment_label==='positif').length;
+  const neg   = RAW.filter(m=>m.sentiment_label==='negatif').length;
+  const items = [
+    {val:total, lbl:'Messages'},
+    {val:user,  lbl:'De vous'},
+    {val:pos,   lbl:'Positifs 😊', color:'#2ecc71'},
+    {val:neg,   lbl:'Négatifs 😟', color:'#e74c3c'},
+  ];
+  document.getElementById('statsStrip').innerHTML = items.map(i=>
+    `<div class="stat-card">
+       <div class="stat-val" ${i.color?`style="color:${i.color}"`:''}>${i.val}</div>
+       <div class="stat-lbl">${i.lbl}</div>
+     </div>`).join('');
+}
+
+function buildFilters() {
+  const opts = [{key:null,lbl:'Tous'},{key:'user',lbl:'👤 Vous'},
+                {key:'assistant',lbl:'✨ Lumia'},
+                {key:'positif',lbl:'😊 Positif'},{key:'neutre',lbl:'😐 Neutre'},{key:'negatif',lbl:'😟 Négatif'}];
+  document.getElementById('filterBar').innerHTML = opts.map(o=>
+    `<button class="f-btn ${activeFilter===o.key?'active':''}"
+      onclick="setFilter(${o.key===null?'null':`'${o.key}'`})">${o.lbl}</button>`).join('');
+}
+
+window.setFilter = k => { activeFilter = (k==='null'||!k) ? null : k; buildFilters(); renderMessages(); };
+
+function renderMessages() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = RAW;
+  if (activeFilter === 'user' || activeFilter === 'assistant') {
+    list = list.filter(m => m.role === activeFilter);
+  } else if (activeFilter) {
+    list = list.filter(m => m.sentiment_label === activeFilter);
+  }
+  if (q) list = list.filter(m => m.message.toLowerCase().includes(q));
+
+  if (!list.length) {
+    document.getElementById('msgList').innerHTML = '<div class="empty">Aucun message trouvé.</div>';
+    return;
+  }
+  document.getElementById('msgList').innerHTML = list.map(m => {
+    const isRTL = m.language === 'ar';
+    const badge = m.sentiment_label ?
+      `<div class="sent-badge ${m.sentiment_label}">
+         ${EMOJIS[m.sentiment_label]} ${LABELS[m.sentiment_label]}
+         · score ${m.sentiment_score !== null ? parseFloat(m.sentiment_label === m.sentiment_label && m.sentiment_score).toFixed(2) : '—'}
+       </div>` : '';
+    return `<div class="msg-item ${m.role}">
+      <div class="msg-av">${m.role==='user'?'👤':'✨'}</div>
+      <div class="msg-body">
+        <div class="msg-header">
+          <span class="msg-role">${m.role==='user'?'Vous':'Lumia'}</span>
+          <span class="msg-time">${(m.created_at||'').substring(0,16).replace('T',' ')}</span>
+          ${m.language?`<span class="msg-lang">${m.language.toUpperCase()}</span>`:''}
+        </div>
+        <div class="msg-text" ${isRTL?'dir="rtl"':''}>${esc(m.message)}</div>
+        ${badge}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+function exportPDF() {
+  window.open('/history/export/pdf', '_blank');
+}
+
+buildStats();
+buildFilters();
+renderMessages();
+</script>
+</body>
+</html>
